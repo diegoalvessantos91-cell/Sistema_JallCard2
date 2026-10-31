@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="container mt-4">
+    <!-- Cabeçalho e Botão Novo -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 style="color: #00b4d8; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Gestão de Utilizadores</h2>
+            <p style="color: #8a8d93;">Adicione novos operadores, defina acessos ou desbloqueie contas inativas.</p>
+        </div>
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#modalNovoUsuario" style="background-color: #00b4d8; color: #111217; font-weight: bold;">+ Novo Utilizador</button>
+    </div>
+
+    {% if erro %}
+    <div class="alert alert-danger" style="background-color: #2c1517; border-color: #5c2025; color: #ff8787;">{{ erro }}</div>
+    {% endif %}
+
+    <!-- Barra de Pesquisa e Organização -->
+    <div class="row mb-3 g-2">
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-text" style="background-color: #1e2026; border: 1px solid #2a2d35; color: #8a8d93;">🔍</span>
+                <input type="text" id="pesquisaUsuario" class="form-control" placeholder="Pesquisar utilizador por nome..." style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select id="ordenarPermissao" class="form-select" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                <option value="padrao">Organizar: Ordem de Registo</option>
+                <option value="maior">Mais Permissões (Maior para Menor)</option>
+                <option value="menor">Menos Permissões (Menor para Maior)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabela de Utilizadores -->
+    <div class="card" style="background-color: #111217; border: 1px solid #2a2d35;">
+        <div class="card-body p-0" style="overflow-x: auto;">
+            <table class="table table-dark table-hover m-0" id="tabelaUtilizadores">
+                <thead>
+                    <tr>
+                        <th style="color: #8a8d93;">Nome</th>
+                        <th style="color: #8a8d93;">Login</th>
+                        <th style="color: #8a8d93; text-align: center;">Admin</th>
+                        <th style="color: #8a8d93; text-align: center;">Gravação</th>
+                        <th style="color: #8a8d93; text-align: center;">Impressão</th>
+                        <th style="color: #8a8d93; text-align: center;">Insertadora</th>
+                        <th style="color: #8a8d93; text-align: center;">Manuseio</th>
+                        <th style="color: #8a8d93; text-align: center;">Pré-Exp</th>
+                        <th style="color: #8a8d93; text-align: right;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in usuarios %}
+                    <tr style="border-bottom: 1px solid #1e2026;">
+                        <td style="font-weight: bold; color: #ffffff;">
+                            {{ u.nome }}
+                            {% if 'bloqueado' in u.keys() and u.bloqueado == 1 %}
+                                <span class="badge ms-2" style="background-color: #842029; color: #f8d7da; font-size: 0.7rem; letter-spacing: 0.5px;">BLOQUEADO</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ u.login }}</td>
+                        <td style="text-align: center;">{% if u.is_admin %}✅{% else %}❌{% endif %}</td>
+                        <td style="text-align: center;">{% if u.acesso_gravacao %}✅{% else %}❌{% endif %}</td>
+                        <td style="text-align: center;">{% if u.acesso_impressao %}✅{% else %}❌{% endif %}</td>
+                        <td style="text-align: center;">{% if u.acesso_insertadora %}✅{% else %}❌{% endif %}</td>
+                        <td style="text-align: center;">{% if u.acesso_manuseio %}✅{% else %}❌{% endif %}</td>
+                        <td style="text-align: center;">{% if u.acesso_pre_expedicao %}✅{% else %}❌{% endif %}</td>
+                        <td style="text-align: right; white-space: nowrap;">
+                            
+                            <!-- Botão de Desbloqueio -->
+                            {% if 'bloqueado' in u.keys() and u.bloqueado == 1 %}
+                            <form action="{{ url_for('desbloquear_usuario', id_usuario=u.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Desbloquear este utilizador e redefinir a palavra-passe para 1234?');">
+                                <button type="submit" class="btn btn-sm me-1" style="background-color: #198754; color: white;" title="Desbloquear e Redefinir Senha">🔓 Desbloquear</button>
+                            </form>
+                            {% endif %}
+
+                            <button class="btn btn-sm btn-outline-warning me-1" onclick="abrirEdicao({{ u.id }}, '{{ u.nome }}', '{{ u.login }}', {{ u.is_admin }}, {{ u.acesso_gravacao }}, {{ u.acesso_impressao }}, {{ u.acesso_insertadora }}, {{ u.acesso_manuseio }}, {{ u.acesso_pre_expedicao }})" title="Editar Utilizador">✏️</button>
+                            
+                            <form action="{{ url_for('excluir_usuario', id_usuario=u.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este utilizador?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Apagar Utilizador">❌</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Utilizador -->
+<div class="modal fade" id="modalNovoUsuario" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: #111217; border: 1px solid #2a2d35; color: white;">
+            <div class="modal-header" style="border-bottom: 1px solid #2a2d35;">
+                <h5 class="modal-title">Novo Utilizador</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('salvar_usuario') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Nome Completo</label>
+                        <input type="text" class="form-control" name="nome" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Login</label>
+                        <input type="text" class="form-control" name="login" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Palavra-passe Padrão</label>
+                        <input type="text" class="form-control" name="senha" value="1234" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        <small style="color: #00b4d8; font-size: 0.8rem;">O utilizador terá de mudar esta senha no primeiro acesso.</small>
+                    </div>
+                    <hr style="border-color: #2a2d35;">
+                    <label class="form-label mb-2" style="color: #00b4d8; font-weight: bold;">Permissões de Acesso</label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="is_admin" id="novo_admin">
+                        <label class="form-check-label" for="novo_admin">Administrador Total</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_gravacao" id="novo_gravacao" checked>
+                        <label class="form-check-label" for="novo_gravacao">Setor: Gravação</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_impressao" id="novo_impressao" checked>
+                        <label class="form-check-label" for="novo_impressao">Setor: Impressão</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_insertadora" id="novo_insertadora" checked>
+                        <label class="form-check-label" for="novo_insertadora">Setor: Insertadora</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_manuseio" id="novo_manuseio" checked>
+                        <label class="form-check-label" for="novo_manuseio">Setor: Manuseio</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_pre_expedicao" id="novo_pre" checked>
+                        <label class="form-check-label" for="novo_pre">Setor: Pré-Expedição</label>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #2a2d35;">
+                    <button type="submit" class="btn w-100" style="background-color: #00b4d8; color: #111217; font-weight: bold;">Salvar Utilizador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Utilizador -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: #111217; border: 1px solid #2a2d35; color: white;">
+            <div class="modal-header" style="border-bottom: 1px solid #2a2d35;">
+                <h5 class="modal-title">Editar Utilizador</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarUsuario" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Nome Completo</label>
+                        <input type="text" class="form-control" name="nome" id="edit_nome" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Login</label>
+                        <input type="text" class="form-control" name="login" id="edit_login" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Nova Palavra-passe <span style="font-size: 0.8rem; color: #8a8d93;">(Deixe em branco para manter a atual)</span></label>
+                        <input type="password" class="form-control" name="senha" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        <small style="color: #ff9800; font-size: 0.8rem;">Se alterar a senha aqui, o utilizador será forçado a trocá-la novamente no primeiro acesso.</small>
+                    </div>
+                    <hr style="border-color: #2a2d35;">
+                    <label class="form-label mb-2" style="color: #00b4d8; font-weight: bold;">Permissões de Acesso</label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="is_admin" id="edit_admin">
+                        <label class="form-check-label" for="edit_admin">Administrador Total</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_gravacao" id="edit_gravacao">
+                        <label class="form-check-label" for="edit_gravacao">Setor: Gravação</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_impressao" id="edit_impressao">
+                        <label class="form-check-label" for="edit_impressao">Setor: Impressão</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_insertadora" id="edit_insertadora">
+                        <label class="form-check-label" for="edit_insertadora">Setor: Insertadora</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_manuseio" id="edit_manuseio">
+                        <label class="form-check-label" for="edit_manuseio">Setor: Manuseio</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="acesso_pre_expedicao" id="edit_pre">
+                        <label class="form-check-label" for="edit_pre">Setor: Pré-Expedição</label>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #2a2d35;">
+                    <button type="submit" class="btn w-100" style="background-color: #ff9800; color: #111217; font-weight: bold;">Atualizar Utilizador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Função para abrir o Modal de Edição
+    function abrirEdicao(id, nome, login, isAdmin, gravacao, impressao, insertadora, manuseio, pre) {
+        document.getElementById('formEditarUsuario').action = '/editar_usuario/' + id;
+        document.getElementById('edit_nome').value = nome;
+        document.getElementById('edit_login').value = login;
+        document.getElementById('edit_admin').checked = isAdmin === 1;
+        document.getElementById('edit_gravacao').checked = gravacao === 1;
+        document.getElementById('edit_impressao').checked = impressao === 1;
+        document.getElementById('edit_insertadora').checked = insertadora === 1;
+        document.getElementById('edit_manuseio').checked = manuseio === 1;
+        document.getElementById('edit_pre').checked = pre === 1;
+        
+        new bootstrap.Modal(document.getElementById('modalEditarUsuario')).show();
+    }
+
+    // Lógica da Pesquisa e Organização por Quantidade de Permissões
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputPesquisa = document.getElementById('pesquisaUsuario');
+        const selectOrdenacao = document.getElementById('ordenarPermissao');
+        const tabela = document.querySelector('#tabelaUtilizadores tbody');
+        
+        // Guarda a ordem original para quando selecionar "Padrão"
+        const linhasOriginais = Array.from(tabela.getElementsByTagName('tr'));
+
+        // Função para contar os '✅' de cada linha (colunas de 2 a 7)
+        function contarPermissoes(linha) {
+            let total = 0;
+            const celulas = linha.getElementsByTagName('td');
+            for (let i = 2; i <= 7; i++) {
+                if (celulas[i] && celulas[i].textContent.includes('✅')) {
+                    total++;
+                }
+            }
+            return total;
+        }
+
+        function atualizarTabela() {
+            const termo = inputPesquisa.value.toLowerCase();
+            const ordem = selectOrdenacao.value;
+
+            // Clona o array original para não perder a ordem de registo
+            let linhasAtuais = [...linhasOriginais];
+
+            // Ordenação (Maior ou Menor quantidade de permissões)
+            if (ordem === 'maior') {
+                linhasAtuais.sort((a, b) => contarPermissoes(b) - contarPermissoes(a));
+            } else if (ordem === 'menor') {
+                linhasAtuais.sort((a, b) => contarPermissoes(a) - contarPermissoes(b));
+            }
+
+            // Limpa a tabela e reconstrói na nova ordem com a pesquisa aplicada
+            tabela.innerHTML = '';
+            
+            linhasAtuais.forEach(linha => {
+                const nome = linha.getElementsByTagName('td')[0].textContent.toLowerCase();
+                
+                if (nome.includes(termo)) {
+                    linha.style.display = '';
+                } else {
+                    linha.style.display = 'none';
+                }
+                tabela.appendChild(linha);
+            });
+        }
+
+        // Executa sempre que o utilizador escreve ou muda o menu suspenso
+        inputPesquisa.addEventListener('keyup', atualizarTabela);
+        selectOrdenacao.addEventListener('change', atualizarTabela);
+    });
+</script>
+{% endblock %}

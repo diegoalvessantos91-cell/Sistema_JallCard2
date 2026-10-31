@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="container mt-4" style="max-width: 900px;">
+    
+    <div class="mb-4">
+        <h2 style="color: #00b4d8; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Meu Perfil</h2>
+        <p style="color: #8a8d93;">Personalize o seu avatar e altere as suas credenciais de segurança.</p>
+    </div>
+
+    {% if mensagem %}
+    <div class="alert alert-success" style="background-color: #1b2e23; border-color: #2e5c3a; color: #75b798;">{{ mensagem }}</div>
+    {% endif %}
+    {% if erro %}
+    <div class="alert alert-danger" style="background-color: #2c1517; border-color: #5c2025; color: #ff8787;">{{ erro }}</div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Editar Dados e Avatar -->
+        <div class="col-md-7">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.1rem;">Informações da Conta</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('perfil') }}" method="POST">
+                        <input type="hidden" name="acao" value="atualizar_perfil">
+                        
+                        <div class="mb-4">
+                            <label class="form-label text-secondary">Nome de Exibição</label>
+                            <input type="text" class="form-control" name="nome_usuario" value="{{ usuario.nome_usuario or usuario.nome }}" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        </div>
+
+                        <label class="form-label text-secondary mb-3">Escolha o seu Avatar</label>
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            {% set avatares = ['👤', '👨‍💻', '👩‍💻', '🧑‍🏭', '🧑‍🔧', '🕵️‍♂️', '🦸‍♂️', '🦸‍♀️', '🥷', '🤖', '🦊', '🐯', '🐼', '🦁', '🦉', '👽', '👨‍💼', '👩‍💼', '👷‍♂️', '👷‍♀️', '👨‍🔬', '👩‍🔬', '🐶', '🐱', '🦄', '🐲', '🚀', '⭐', '🔥', '💎', '🎯', '⚡', '💡', '🏆', '👑', '🎨', '🎧', '⚽', '🚀', '💻'] %}
+                            
+                            {% for icone in avatares %}
+                            <input type="radio" class="btn-check" name="avatar" id="avatar_{{ loop.index }}" value="{{ icone }}" {% if (usuario.avatar or '👤') == icone %}checked{% endif %}>
+                            <label class="btn btn-outline-secondary d-flex align-items-center justify-content-center" for="avatar_{{ loop.index }}" style="width: 50px; height: 50px; font-size: 1.5rem; border-color: #2a2d35;">
+                                {{ icone }}
+                            </label>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn w-100 py-2" style="background-color: #00b4d8; color: #111217; font-weight: bold;">SALVAR PERFIL</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mudar Palavra-Passe -->
+        <div class="col-md-5">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.1rem;">Segurança</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('perfil') }}" method="POST">
+                        <input type="hidden" name="acao" value="mudar_senha">
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-secondary">Palavra-passe Atual</label>
+                            <input type="password" class="form-control" name="senha_atual" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary">Nova Palavra-passe</label>
+                            <input type="password" class="form-control" name="nova_senha" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary">Confirmar Nova Palavra-passe</label>
+                            <input type="password" class="form-control" name="confirmar_senha" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        </div>
+
+                        <button type="submit" class="btn w-100 py-2" style="background-color: #ff9800; color: #111217; font-weight: bold;">ALTERAR PALAVRA-PASSE</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilo para destacar o avatar selecionado */
+    .btn-check:checked + .btn-outline-secondary {
+        background-color: #2a2d35;
+        border-color: #00b4d8 !important;
+        box-shadow: 0 0 10px rgba(0, 180, 216, 0.4);
+        transform: scale(1.1);
+    }
+    .btn-outline-secondary {
+        transition: all 0.2s;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #1e2026;
+        border-color: #00b4d8 !important;
+    }
+</style>
+{% endblock %}

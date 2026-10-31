@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+<div class="container-fluid px-4 mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 style="color: #4caf50;">Gestão de Máquinas</h4>
+        <span class="text-secondary">Gestor Logado: <strong style="color: #00b4d8; text-transform: uppercase;">{{ session['nome_usuario'] }}</strong></span>
+    </div>
+
+    <div class="row">
+        <!-- Formulário para Adicionar -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100" style="background-color: #21252b; border: 1px solid #2a2d35; border-radius: 8px;">
+                <div class="card-body">
+                    <h5 class="text-light mb-4" style="border-left: 4px solid #4caf50; padding-left: 10px;">Adicionar Máquina</h5>
+                    
+                    <form action="/salvar_maquina" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label text-light">Setor</label>
+                            <select name="setor" class="form-select bg-dark text-light border-secondary" required>
+                                <option value="Gravacao">Gravação</option>
+                                <option value="Impressao">Impressão</option>
+                                <option value="Insertadora">Insertadora</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-light">Nome / Identificação da Máquina</label>
+                            <input type="text" name="nome" class="form-control bg-dark text-light border-secondary" placeholder="Ex: Datacard 05" required>
+                        </div>
+                        <button type="submit" class="btn w-100 py-2" style="background-color: #4caf50; color: #111217; font-weight: bold;">CADASTRAR MÁQUINA</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela das Máquinas Registadas -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100" style="background-color: #21252b; border: 1px solid #2a2d35; border-radius: 8px;">
+                <div class="card-body">
+                    <h5 class="text-light mb-4" style="border-left: 4px solid #00b4d8; padding-left: 10px;">Equipamentos Cadastrados</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover text-center" style="font-size: 0.9rem; --bs-table-bg: transparent;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #2a2d35;">
+                                    <th>Setor</th>
+                                    <th>Nome da Máquina</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody style="border-top: none;">
+                                {% for m in maquinas %}
+                                <tr>
+                                    <td style="color: #8a8d93;">{{ m.setor }}</td>
+                                    <td style="font-weight: bold;">{{ m.nome }}</td>
+                                    <td>
+                                        <form action="/excluir_maquina/{{ m.id }}" method="POST" onsubmit="return confirm('Excluir permanentemente a máquina {{ m.nome }}?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">🗑️</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="3" class="text-secondary">Nenhuma máquina registada.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

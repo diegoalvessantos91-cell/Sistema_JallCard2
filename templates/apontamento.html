@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="container mt-4">
+    
+    <!-- Cabeçalho -->
+    <div class="mb-3">
+        <h2 style="color: #00b4d8; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">SETOR: {{ setor }}</h2>
+    </div>
+
+    <div class="row mb-5">
+        <!-- Formulário de Apontamento (Esquerda) -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.1rem;">Novo Apontamento</h5>
+                </div>
+                <div class="card-body">
+                    {% if mensagem %}
+                    <div class="alert alert-success" style="background-color: #1b2e23; border-color: #2e5c3a; color: #75b798; font-size: 0.9rem;">{{ mensagem }}</div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label" style="color: #8a8d93;">Turno</label>
+                            <select class="form-select" name="turno" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                                <option value="" disabled selected>Selecione o turno...</option>
+                                <option value="1º Turno">1º Turno</option>
+                                <option value="2º Turno">2º Turno</option>
+                                <option value="3º Turno">3º Turno</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="color: #8a8d93;">Máquina</label>
+                            <select class="form-select" name="maquina" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                                <option value="" disabled selected>Selecione a máquina...</option>
+                                {% for maq in lista_maquinas %}
+                                <option value="{{ maq }}">{{ maq }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label" style="color: #8a8d93;">Quantidade Produzida</label>
+                            <input type="number" class="form-control" name="quantidade" min="1" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        </div>
+                        <button type="submit" class="btn w-100" style="background-color: #00b4d8; color: #111217; font-weight: bold;">SALVAR APONTAMENTO</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimos Lançamentos (Direita) -->
+        <div class="col-lg-8">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.1rem;">Últimos Lançamentos</h5>
+                    <span class="badge" style="background-color: #2a2d35; color: #8a8d93;">Últimos 15</span>
+                </div>
+                <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
+                    <table class="table table-dark table-hover m-0" style="background-color: transparent;">
+                        <thead style="border-bottom: 1px solid #2a2d35; position: sticky; top: 0; background-color: #111217;">
+                            <tr>
+                                <th style="color: #8a8d93; font-weight: normal;">Turno</th>
+                                <th style="color: #8a8d93; font-weight: normal;">Máquina</th>
+                                <th style="color: #8a8d93; font-weight: normal;">Operador</th>
+                                <th style="color: #8a8d93; font-weight: normal; text-align: right;">Qtd</th>
+                                <th style="text-align: right; color: #8a8d93; font-weight: normal;">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in ultimos_lancamentos %}
+                            <tr style="border-bottom: 1px solid #1e2026;">
+                                <td style="padding: 12px; color: #ffffff;">{{ item[1] }}</td>
+                                <td style="padding: 12px; color: #8a8d93;">{{ item[2] }}</td>
+                                <td style="padding: 12px; color: #cbd5e1; font-size: 0.9rem;">👤 {{ item[5] }}</td>
+                                <td style="padding: 12px; color: #00b4d8; font-weight: bold; text-align: right;">+ {{ item[3] }}</td>
+                                <td style="padding: 12px; text-align: right; white-space: nowrap;">
+                                    {% if item[4] == session_user_id or is_admin %}
+                                        <button class="btn btn-sm btn-outline-warning" onclick="abrirEdicao({{ item[0] }}, '{{ item[1] }}', '{{ item[2] }}', {{ item[3] }})" title="Editar Registo">✏️</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center text-muted py-4">Sem lançamentos recentes.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center" style="background-color: #1e2026; border-top: 1px solid #2a2d35;">
+                    <span style="color: #8a8d93; font-size: 0.9rem;">TOTAL GERAL (HOJE):</span>
+                    <span class="badge" style="background-color: #00b4d8; color: #111217; font-size: 1rem; padding: 6px 12px;">{{ total_hoje }} unids</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos Analíticos -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header text-center" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.0rem;">Produção por Máquina (Mês Atual)</h5>
+                </div>
+                <div class="card-body" style="position: relative; height: 320px; display: flex; justify-content: center; align-items: center;">
+                    <canvas id="graficoMaquinas"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header text-center" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.0rem;">Produção por Turno (Mês Atual)</h5>
+                </div>
+                <div class="card-body" style="position: relative; height: 320px; display: flex; justify-content: center; align-items: center;">
+                    <canvas id="graficoTurnos"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edição -->
+<div class="modal fade" id="modalEditar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: #111217; border: 1px solid #2a2d35; color: white;">
+            <div class="modal-header" style="border-bottom: 1px solid #2a2d35;">
+                <h5 class="modal-title">Editar Apontamento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditar" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Turno</label>
+                        <select class="form-select" name="turno" id="edit_turno" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                            <option value="1º Turno">1º Turno</option>
+                            <option value="2º Turno">2º Turno</option>
+                            <option value="3º Turno">3º Turno</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Máquina</label>
+                        <select class="form-select" name="maquina" id="edit_maquina" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                            {% for maq in lista_maquinas %}
+                            <option value="{{ maq }}">{{ maq }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Quantidade</label>
+                        <input type="number" class="form-control" name="quantidade" id="edit_qtd" min="1" required style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #2a2d35;">
+                    <button type="submit" class="btn w-100" style="background-color: #ff9800; color: #111217; font-weight: bold;">Salvar Alteração</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function abrirEdicao(id, turno, maquina, quantidade) {
+        document.getElementById('formEditar').action = '/editar_geral/' + id;
+        document.getElementById('edit_turno').value = turno;
+        document.getElementById('edit_maquina').value = maquina;
+        document.getElementById('edit_qtd').value = quantidade;
+        new bootstrap.Modal(document.getElementById('modalEditar')).show();
+    }
+
+    const coresAzuis = ['#48cae4', '#0096c7', '#0077b6', '#03045e', '#00b4d8'];
+    const corBorda = '#111217';
+
+    // Gráfico de Máquinas
+    const labelsMaq = {{ labels_maq | tojson }};
+    const valoresMaq = {{ valores_maq | tojson }};
+    const totalMaq = valoresMaq.reduce((a, b) => a + (Number(b) || 0), 0);
+
+    if (labelsMaq.length > 0 && totalMaq > 0) {
+        new Chart(document.getElementById('graficoMaquinas'), {
+            type: 'pie',
+            data: {
+                labels: labelsMaq,
+                datasets: [{
+                    data: valoresMaq,
+                    backgroundColor: coresAzuis.slice(0, labelsMaq.length),
+                    borderColor: corBorda,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#8a8d93', font: { size: 12 } } },
+                    tooltip: { callbacks: { label: function(context) { return ' ' + context.formattedValue + ' unids'; } } }
+                }
+            }
+        });
+    } else {
+        document.getElementById('graficoMaquinas').parentElement.innerHTML = '<p style="color: #4a4d55;">Sem dados neste mês.</p>';
+    }
+
+    // Gráfico de Turnos
+    const labelsTurno = {{ labels_turno | tojson }};
+    const valoresTurno = {{ valores_turno | tojson }};
+    const totalTurno = valoresTurno.reduce((a, b) => a + (Number(b) || 0), 0);
+
+    if (labelsTurno.length > 0 && totalTurno > 0) {
+        new Chart(document.getElementById('graficoTurnos'), {
+            type: 'pie',
+            data: {
+                labels: labelsTurno,
+                datasets: [{
+                    data: valoresTurno,
+                    backgroundColor: ['#48cae4', '#0077b6', '#023e8a'],
+                    borderColor: corBorda,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#8a8d93', font: { size: 12 } } },
+                    tooltip: { callbacks: { label: function(context) { return ' ' + context.formattedValue + ' unids'; } } }
+                }
+            }
+        });
+    } else {
+        document.getElementById('graficoTurnos').parentElement.innerHTML = '<p style="color: #4a4d55;">Sem dados neste mês.</p>';
+    }
+</script>
+{% endblock %}

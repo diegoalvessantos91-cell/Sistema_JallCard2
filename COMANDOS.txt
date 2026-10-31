@@ -1,0 +1,5 @@
+COMANDOS 
+pip install flask - instalar
+pip install waitress
+python app.py
+pip install --no-index --find-links=. flask waitress

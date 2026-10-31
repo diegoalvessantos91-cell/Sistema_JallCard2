@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="container mt-4">
+    <div class="mb-4">
+        <h2 style="color: #00b4d8; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Auditoria de Produção</h2>
+        <p style="color: #8a8d93;">Histórico dos últimos 30 registos por setor. Elimine registos incorretos aqui.</p>
+    </div>
+
+    <!-- Tabela Manuseio -->
+    <div class="card mb-5" style="background-color: #111217; border: 1px solid #2a2d35;">
+        <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+            <h5 class="m-0 text-white">Setor: Manuseio</h5>
+        </div>
+        <div class="card-body p-0" style="overflow-x: auto;">
+            <table class="table table-dark table-hover m-0">
+                <thead>
+                    <tr>
+                        <th style="color: #8a8d93;">Data/Hora</th>
+                        <th style="color: #8a8d93;">Turno</th>
+                        <th style="color: #8a8d93;">Operador(es)</th>
+                        <th style="color: #8a8d93;">OP</th>
+                        <th style="color: #8a8d93;">Envelopado</th>
+                        <th style="color: #8a8d93;">Auditado</th>
+                        <th style="color: #8a8d93;">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in manuseio %}
+                    <tr style="border-bottom: 1px solid #1e2026;">
+                        <td>{{ item.data_registro }}</td>
+                        <td>{{ item.turno }}</td>
+                        <td>
+                            {{ item.operador }}
+                            {% if item.operador2 %}
+                                <span style="color: #00b4d8;"> & {{ item.operador2 }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.op }}</td>
+                        <td style="color: #00b4d8; font-weight: bold;">{{ item.envelopado }}</td>
+                        <td style="color: #ff9800; font-weight: bold;">{{ item.auditado }}</td>
+                        <td>
+                            <form action="{{ url_for('excluir', tipo='manuseio', id_registro=item.id) }}" method="POST" onsubmit="return confirm('Tem certeza que quer apagar este registo?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Apagar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">Sem registos recentes.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tabela Gravação -->
+    <div class="card mb-5" style="background-color: #111217; border: 1px solid #2a2d35;">
+        <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+            <h5 class="m-0 text-white">Setor: Gravação</h5>
+        </div>
+        <div class="card-body p-0" style="overflow-x: auto;">
+            <table class="table table-dark table-hover m-0">
+                <thead>
+                    <tr>
+                        <th style="color: #8a8d93;">Data/Hora</th>
+                        <th style="color: #8a8d93;">Turno</th>
+                        <th style="color: #8a8d93;">Operador</th>
+                        <th style="color: #8a8d93;">Máquina</th>
+                        <th style="color: #8a8d93;">Quantidade</th>
+                        <th style="color: #8a8d93;">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in gravacao %}
+                    <tr style="border-bottom: 1px solid #1e2026;">
+                        <td>{{ item.data_registro }}</td>
+                        <td>{{ item.turno }}</td>
+                        <td>{{ item.operador }}</td>
+                        <td>{{ item.maquina }}</td>
+                        <td style="color: #00b4d8; font-weight: bold;">{{ item.quantidade }}</td>
+                        <td>
+                            <form action="{{ url_for('excluir', tipo='geral', id_registro=item.id) }}" method="POST" onsubmit="return confirm('Tem certeza que quer apagar este registo?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Apagar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">Sem registos recentes.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Tabela Impressão -->
+    <div class="card mb-5" style="background-color: #111217; border: 1px solid #2a2d35;">
+        <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+            <h5 class="m-0 text-white">Setor: Impressão</h5>
+        </div>
+        <div class="card-body p-0" style="overflow-x: auto;">
+            <table class="table table-dark table-hover m-0">
+                <thead>
+                    <tr>
+                        <th style="color: #8a8d93;">Data/Hora</th>
+                        <th style="color: #8a8d93;">Turno</th>
+                        <th style="color: #8a8d93;">Operador</th>
+                        <th style="color: #8a8d93;">Máquina</th>
+                        <th style="color: #8a8d93;">Quantidade</th>
+                        <th style="color: #8a8d93;">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in impressao %}
+                    <tr style="border-bottom: 1px solid #1e2026;">
+                        <td>{{ item.data_registro }}</td>
+                        <td>{{ item.turno }}</td>
+                        <td>{{ item.operador }}</td>
+                        <td>{{ item.maquina }}</td>
+                        <td style="color: #00b4d8; font-weight: bold;">{{ item.quantidade }}</td>
+                        <td>
+                            <form action="{{ url_for('excluir', tipo='geral', id_registro=item.id) }}" method="POST" onsubmit="return confirm('Tem certeza que quer apagar este registo?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Apagar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">Sem registos recentes.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tabela Insertadora -->
+    <div class="card mb-5" style="background-color: #111217; border: 1px solid #2a2d35;">
+        <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+            <h5 class="m-0 text-white">Setor: Insertadora</h5>
+        </div>
+        <div class="card-body p-0" style="overflow-x: auto;">
+            <table class="table table-dark table-hover m-0">
+                <thead>
+                    <tr>
+                        <th style="color: #8a8d93;">Data/Hora</th>
+                        <th style="color: #8a8d93;">Turno</th>
+                        <th style="color: #8a8d93;">Operador</th>
+                        <th style="color: #8a8d93;">Máquina</th>
+                        <th style="color: #8a8d93;">Quantidade</th>
+                        <th style="color: #8a8d93;">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in insertadora %}
+                    <tr style="border-bottom: 1px solid #1e2026;">
+                        <td>{{ item.data_registro }}</td>
+                        <td>{{ item.turno }}</td>
+                        <td>{{ item.operador }}</td>
+                        <td>{{ item.maquina }}</td>
+                        <td style="color: #00b4d8; font-weight: bold;">{{ item.quantidade }}</td>
+                        <td>
+                            <form action="{{ url_for('excluir', tipo='geral', id_registro=item.id) }}" method="POST" onsubmit="return confirm('Tem certeza que quer apagar este registo?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Apagar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">Sem registos recentes.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tabela Pré-Expedição -->
+    <div class="card mb-5" style="background-color: #111217; border: 1px solid #2a2d35;">
+        <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+            <h5 class="m-0 text-white">Setor: Pré-Expedição</h5>
+        </div>
+        <div class="card-body p-0" style="overflow-x: auto;">
+            <table class="table table-dark table-hover m-0">
+                <thead>
+                    <tr>
+                        <th style="color: #8a8d93;">Data/Hora</th>
+                        <th style="color: #8a8d93;">Turno</th>
+                        <th style="color: #8a8d93;">Operador</th>
+                        <th style="color: #8a8d93;">Quantidade</th>
+                        <th style="color: #8a8d93;">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pre_expedicao %}
+                    <tr style="border-bottom: 1px solid #1e2026;">
+                        <td>{{ item.data_registro }}</td>
+                        <td>{{ item.turno }}</td>
+                        <td>{{ item.operador }}</td>
+                        <td style="color: #00b4d8; font-weight: bold;">{{ item.quantidade }}</td>
+                        <td>
+                            <form action="{{ url_for('excluir', tipo='geral', id_registro=item.id) }}" method="POST" onsubmit="return confirm('Tem certeza que quer apagar este registo?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Apagar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">Sem registos recentes.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

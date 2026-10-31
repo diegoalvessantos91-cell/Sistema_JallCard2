@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="container mt-4">
+    
+    <!-- Cabeçalho -->
+    <div class="mb-3">
+        <h2 style="color: #00b4d8; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">SETOR: MANUSEIO</h2>
+    </div>
+
+    <!-- Interface Principal de Tracking de Lotes -->
+    <div class="row mb-5">
+        
+        <!-- Formulário de Entrada (Esquerda) -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.1rem;">Dados da Produção</h5>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Exibição dos Operadores Fixo -->
+                    <div class="mb-4 p-3 rounded" style="background-color: #1e2026; border: 1px solid #2a2d35; border-left: 4px solid #00b4d8;">
+                        <div style="color: #8a8d93; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Operador Principal</div>
+                        <div style="color: #ffffff; font-size: 1.1rem; font-weight: bold;">👤 {{ nome_usuario }}</div>
+                        
+                        <!-- Bloco do Segundo Operador -->
+                        <div id="displayDupla" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #2a2d35;">
+                            <div style="color: #8a8d93; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">Operador Dupla</div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div style="color: #4caf50; font-size: 1.1rem; font-weight: bold;">👥 <span id="nomeDuplaStr"></span></div>
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removerDupla()" style="font-size: 0.8rem;">Remover</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Turno</label>
+                        <select class="form-select" id="turno" onchange="salvarRascunho()" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                            <option value="1º Turno">1º Turno</option>
+                            <option value="2º Turno">2º Turno</option>
+                            <option value="3º Turno">3º Turno</option>
+                        </select>
+                    </div>
+
+                    <!-- Botão Toggle de Trabalho em Dupla -->
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="checkDupla" onchange="toggleDupla()" style="background-color: #2a2d35; border-color: #4a4d55; cursor: pointer;">
+                        <label class="form-check-label" for="checkDupla" style="color: #00b4d8; font-weight: bold;">Trabalho em Dupla?</label>
+                    </div>
+                    
+                    <!-- Campos de Autenticação da Dupla -->
+                    <div id="divDuplaForm" class="p-3 mb-4" style="display: none; background-color: #1e2026; border: 1px solid #00b4d8; border-radius: 5px;">
+                        <label class="form-label" style="color: #00b4d8; font-weight: bold; font-size: 0.9rem;">Autenticar Parceiro</label>
+                        <input type="text" class="form-control mb-2" id="loginDupla" placeholder="Login do parceiro" style="background-color: #111217; border: 1px solid #2a2d35; color: white;">
+                        <input type="password" class="form-control mb-2" id="senhaDupla" placeholder="Senha do parceiro" style="background-color: #111217; border: 1px solid #2a2d35; color: white;" onkeypress="if(event.key === 'Enter') validarDupla()">
+                        <button type="button" class="btn w-100" style="background-color: #0077b6; color: white; font-weight: bold;" onclick="validarDupla()">CONFIRMAR DUPLA</button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #8a8d93;">Número da OP</label>
+                        <input type="text" class="form-control" id="op" placeholder="Ex: 123456" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-4">
+                            <label class="form-label" style="color: #8a8d93;">Envelopado</label>
+                            <input type="number" class="form-control" id="envelopado" value="0" min="0" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        </div>
+                        <div class="col-6 mb-4">
+                            <label class="form-label" style="color: #8a8d93;">Auditado</label>
+                            <input type="number" class="form-control" id="auditado" value="0" min="0" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        </div>
+                    </div>
+                    
+                    <!-- Botão de Ação que muda de cor se estiver a editar -->
+                    <button type="button" class="btn w-100 mb-2" id="btnAdicionar" onclick="adicionarOP()" style="background-color: #4caf50; color: #0b0c10; font-weight: bold;">ADICIONAR AO LOTE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela do Lote (Direita) -->
+        <div class="col-lg-8">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.1rem;">Lote Atual (Aberto)</h5>
+                    <div>
+                        <span class="badge me-2" style="background-color: #00b4d8; color: #111217;">Env: <span id="totEnv">0</span></span>
+                        <span class="badge" style="background-color: #ff9800; color: #111217;">Aud: <span id="totAud">0</span></span>
+                    </div>
+                </div>
+                <div class="card-body p-0" style="max-height: 520px; overflow-y: auto;">
+                    <table class="table table-dark table-hover m-0" style="background-color: transparent;">
+                        <thead style="border-bottom: 1px solid #2a2d35; position: sticky; top: 0; background-color: #111217;">
+                            <tr>
+                                <th style="color: #8a8d93; font-weight: normal;">OP</th>
+                                <th style="color: #8a8d93; font-weight: normal;">Início</th>
+                                <th style="color: #8a8d93; font-weight: normal;">Fim</th>
+                                <th style="color: #8a8d93; font-weight: normal; text-align: right;">Env</th>
+                                <th style="color: #8a8d93; font-weight: normal; text-align: right;">Aud</th>
+                                <th style="text-align: right; color: #8a8d93; font-weight: normal;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaLote">
+                            <!-- JS insere linhas aqui -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer" style="background-color: #1e2026; border-top: 1px solid #2a2d35;">
+                    <button type="button" class="btn w-100" onclick="fecharTurno()" style="background-color: #00b4d8; color: #0b0c10; font-weight: bold; letter-spacing: 1px;">FECHAR TURNO E SALVAR</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Linha de Dashboard Analítico do Manuseio -->
+    <div class="row mb-5">
+        <div class="col-lg-5 mb-4 mb-lg-0">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header text-center" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0 text-white" style="font-size: 1.0rem;">Produção por Turno (Mês Atual)</h5>
+                </div>
+                <div class="card-body" style="position: relative; height: 350px; display: flex; justify-content: center; align-items: center;">
+                    <canvas id="graficoTurnosManuseio"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card h-100" style="background-color: #111217; border: 1px solid #2a2d35;">
+                <div class="card-header text-center" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+                    <h5 class="m-0" style="font-size: 1.0rem; color: #ffc107; font-weight: bold;">🏆 Top 10 Operadores (Mês Atual)</h5>
+                </div>
+                <div class="card-body p-0" style="max-height: 350px; overflow-y: auto;">
+                    <ul class="list-group list-group-flush" style="background-color: transparent;">
+                        {% if top_operadores %}
+                            {% for op in top_operadores %}
+                            {% set rank = loop.index %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: transparent; border-bottom: 1px solid #1e2026; padding: 12px 20px;">
+                                <div class="d-flex align-items-center">
+                                    <div style="width: 40px; text-align: center;">
+                                        {% if rank == 1 %}
+                                            <span style="font-size: 1.8rem; filter: drop-shadow(0px 0px 5px rgba(255,193,7,0.5));">🥇</span>
+                                        {% elif rank == 2 %}
+                                            <span style="font-size: 1.6rem; filter: drop-shadow(0px 0px 5px rgba(209,210,213,0.5));">🥈</span>
+                                        {% elif rank == 3 %}
+                                            <span style="font-size: 1.4rem; filter: drop-shadow(0px 0px 5px rgba(205,127,50,0.5));">🥉</span>
+                                        {% else %}
+                                            <span class="badge" style="background-color: #2a2d35; color: #8a8d93; font-size: 0.9rem;">{{ rank }}º</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="ms-3" style="font-size: 1.05rem; font-weight: {% if rank <= 3 %}bold{% else %}normal{% endif %}; 
+                                        color: {% if rank == 1 %}#ffc107{% elif rank == 2 %}#d1d2d5{% elif rank == 3 %}#cd7f32{% else %}#a0a3a8{% endif %};">
+                                        {{ op[0] }}
+                                    </span>
+                                </div>
+                                <span style="color: #00b4d8; font-weight: bold; font-size: 1.1rem;">
+                                    {{ op[1] }} <span style="font-size: 0.75rem; color: #8a8d93; font-weight: normal;">pontos</span>
+                                </span>
+                            </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item text-center" style="background-color: transparent; padding: 30px; color: #4a4d55;">
+                                Nenhum dado de produção registado este mês.
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let loteOps = [];
+    let horaInicioAtual = new Date().toLocaleTimeString('pt-PT', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+    
+    let duplaValidada = false;
+    let loginSalvo = "";
+    let senhaSalva = "";
+    let indexEditando = -1;
+
+    // Chave única do rascunho baseada no ID do utilizador logado no Flask
+    const userId = "{{ session.get('id_usuario') }}";
+    const storageKey = 'rascunhoManuseio_' + userId;
+
+    function formatarHora(data) {
+        return data.toLocaleTimeString('pt-PT', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+    }
+
+    // --- LÓGICA DE AUTOGUARDAR ISOLADA POR UTILIZADOR ---
+    function salvarRascunho() {
+        const rascunho = {
+            loteOps: loteOps,
+            horaInicioAtual: horaInicioAtual,
+            turno: document.getElementById('turno').value,
+            duplaValidada: duplaValidada,
+            loginSalvo: loginSalvo,
+            senhaSalva: senhaSalva,
+            nomeDupla: document.getElementById('nomeDuplaStr').innerText
+        };
+        localStorage.setItem(storageKey, JSON.stringify(rascunho));
+    }
+
+    function carregarRascunho() {
+        const dados = localStorage.getItem(storageKey);
+        if (dados) {
+            const rascunho = JSON.parse(dados);
+            loteOps = rascunho.loteOps || [];
+            horaInicioAtual = rascunho.horaInicioAtual || formatarHora(new Date());
+            
+            if (rascunho.turno) {
+                document.getElementById('turno').value = rascunho.turno;
+            }
+
+            if (rascunho.duplaValidada) {
+                duplaValidada = true;
+                loginSalvo = rascunho.loginSalvo;
+                senhaSalva = rascunho.senhaSalva;
+                
+                document.getElementById('checkDupla').checked = true;
+                document.getElementById('checkDupla').disabled = true;
+                document.getElementById('nomeDuplaStr').innerText = rascunho.nomeDupla;
+                document.getElementById('displayDupla').style.display = 'block';
+                document.getElementById('divDuplaForm').style.display = 'none';
+            }
+            atualizarTabela();
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", carregarRascunho);
+    
+    function toggleDupla() {
+        const isDupla = document.getElementById('checkDupla').checked;
+        if (isDupla) {
+            document.getElementById('divDuplaForm').style.display = 'block';
+        } else {
+            document.getElementById('divDuplaForm').style.display = 'none';
+            removerDupla();
+        }
+    }
+
+    function validarDupla() {
+        const login = document.getElementById('loginDupla').value;
+        const senha = document.getElementById('senhaDupla').value;
+
+        if(!login || !senha) { alert("Preencha o login e senha da dupla!"); return; }
+
+        fetch('/validar_dupla', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ login: login, senha: senha })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.sucesso) {
+                duplaValidada = true;
+                loginSalvo = login;
+                senhaSalva = senha;
+                
+                document.getElementById('nomeDuplaStr').innerText = data.nome;
+                document.getElementById('displayDupla').style.display = 'block';
+                document.getElementById('divDuplaForm').style.display = 'none';
+                document.getElementById('checkDupla').disabled = true;
+                
+                salvarRascunho(); 
+            } else {
+                alert("Erro: " + data.erro);
+            }
+        });
+    }
+
+    function removerDupla() {
+        duplaValidada = false;
+        loginSalvo = "";
+        senhaSalva = "";
+        
+        document.getElementById('displayDupla').style.display = 'none';
+        
+        if (document.getElementById('checkDupla').checked) {
+            document.getElementById('divDuplaForm').style.display = 'block';
+        }
+        
+        document.getElementById('checkDupla').disabled = false;
+        document.getElementById('loginDupla').value = "";
+        document.getElementById('senhaDupla').value = "";
+        
+        salvarRascunho();
+    }
+
+    function editarOP(index) {
+        indexEditando = index;
+        const item = loteOps[index];
+        
+        document.getElementById('op').value = item.numero;
+        document.getElementById('envelopado').value = item.envelopado;
+        document.getElementById('auditado').value = item.auditado;
+        
+        const btn = document.getElementById('btnAdicionar');
+        btn.innerText = "SALVAR EDIÇÃO";
+        btn.style.backgroundColor = "#ff9800";
+        btn.style.color = "#111217";
+    }
+
+    function adicionarOP() {
+        const op = document.getElementById('op').value;
+        const envelopado = parseInt(document.getElementById('envelopado').value) || 0;
+        const auditado = parseInt(document.getElementById('auditado').value) || 0;
+        
+        if (!op) { alert("O número da OP é obrigatório!"); return; }
+        if (envelopado === 0 && auditado === 0) { alert("Insira uma quantidade!"); return; }
+
+        if (indexEditando >= 0) {
+            loteOps[indexEditando].numero = op;
+            loteOps[indexEditando].envelopado = envelopado;
+            loteOps[indexEditando].auditado = auditado;
+            
+            indexEditando = -1;
+            const btn = document.getElementById('btnAdicionar');
+            btn.innerText = "ADICIONAR AO LOTE";
+            btn.style.backgroundColor = "#4caf50";
+            
+        } else {
+            const horaFimAtual = formatarHora(new Date());
+            const novoItem = { numero: op, inicio: horaInicioAtual, fim: horaFimAtual, envelopado: envelopado, auditado: auditado };
+            loteOps.push(novoItem);
+            horaInicioAtual = horaFimAtual;
+        }
+
+        document.getElementById('op').value = '';
+        document.getElementById('envelopado').value = '0';
+        document.getElementById('auditado').value = '0';
+        
+        atualizarTabela();
+        salvarRascunho(); 
+    }
+
+    function removerOP(index) {
+        if (indexEditando === index) {
+            indexEditando = -1;
+            const btn = document.getElementById('btnAdicionar');
+            btn.innerText = "ADICIONAR AO LOTE";
+            btn.style.backgroundColor = "#4caf50";
+            document.getElementById('op').value = '';
+            document.getElementById('envelopado').value = '0';
+            document.getElementById('auditado').value = '0';
+        }
+        
+        loteOps.splice(index, 1);
+        atualizarTabela();
+        salvarRascunho();
+    }
+
+    function atualizarTabela() {
+        const tbody = document.getElementById('tabelaLote');
+        tbody.innerHTML = '';
+        let totEnv = 0;
+        let totAud = 0;
+
+        loteOps.forEach((item, index) => {
+            totEnv += item.envelopado;
+            totAud += item.auditado;
+            
+            const corFundo = (index === indexEditando) ? 'background-color: rgba(255, 152, 0, 0.1);' : '';
+            
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = "1px solid #1e2026";
+            tr.style.cssText += corFundo;
+            tr.innerHTML = `
+                <td style="padding: 12px; color: #ffffff; font-weight: bold;">${item.numero}</td>
+                <td style="padding: 12px; color: #8a8d93; font-size: 0.9rem;">${item.inicio}</td>
+                <td style="padding: 12px; color: #8a8d93; font-size: 0.9rem;">${item.fim}</td>
+                <td style="padding: 12px; color: #00b4d8; font-weight: bold; text-align: right;">+ ${item.envelopado}</td>
+                <td style="padding: 12px; color: #ff9800; font-weight: bold; text-align: right;">+ ${item.auditado}</td>
+                <td style="padding: 12px; text-align: right; white-space: nowrap;">
+                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editarOP(${index})" title="Editar Lote">✏️</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removerOP(${index})" title="Apagar Lote">❌</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('totEnv').innerText = totEnv;
+        document.getElementById('totAud').innerText = totAud;
+    }
+
+    function fecharTurno() {
+        if (loteOps.length === 0) { alert("Não há produção no lote para salvar."); return; }
+        if (indexEditando >= 0) { alert("Termine de editar o registo antes de salvar o lote inteiro."); return; }
+
+        const turno = document.getElementById('turno').value;
+        const payload = { turno: turno, ops: loteOps };
+        
+        if (document.getElementById('checkDupla').checked) {
+            if (!duplaValidada) {
+                alert("Por favor, confirme as credenciais da dupla apertando Enter ou clicando em Confirmar Dupla!");
+                return;
+            }
+            payload.login_dupla = loginSalvo;
+            payload.senha_dupla = senhaSalva;
+        }
+
+        fetch('/salvar_manuseio', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                alert("Turno fechado e produção salva com sucesso!");
+                localStorage.removeItem(storageKey); // Limpa apenas o rascunho deste utilizador ao salvar com sucesso!
+                loteOps = [];
+                atualizarTabela();
+                location.reload(); 
+            } else {
+                alert("Erro: " + data.erro);
+            }
+        });
+    }
+
+    // --- GRÁFICO (CHART.JS) ---
+    const coresTurnos = ['#48cae4', '#0077b6', '#023e8a'];
+    const corBorda = '#111217';
+
+    const labelsTurno = {{ labels_turno | tojson }};
+    const valoresTurno = {{ valores_turno | tojson }};
+    const totalTurnos = valoresTurno.reduce((a, b) => a + (Number(b) || 0), 0);
+    
+    if (labelsTurno.length > 0 && totalTurnos > 0) {
+        new Chart(document.getElementById('graficoTurnosManuseio'), {
+            type: 'pie',
+            data: {
+                labels: labelsTurno,
+                datasets: [{
+                    data: valoresTurno,
+                    backgroundColor: coresTurnos,
+                    borderColor: corBorda,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#8a8d93', font: { size: 12 } } },
+                    tooltip: { callbacks: { label: function(context) { return ' ' + context.formattedValue + ' unids'; } } }
+                }
+            }
+        });
+    } else {
+        document.getElementById('graficoTurnosManuseio').parentElement.innerHTML = '<p style="color: #4a4d55;">Sem dados neste mês.</p>';
+    }
+</script>
+{% endblock %}

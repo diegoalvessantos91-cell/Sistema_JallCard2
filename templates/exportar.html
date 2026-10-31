@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="container mt-4" style="max-width: 600px;">
+    
+    <div class="mb-4">
+        <h2 style="color: #00b4d8; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Exportar Relatórios</h2>
+        <p style="color: #8a8d93;">Selecione o período e o setor desejado para descarregar os dados filtrados.</p>
+    </div>
+
+    <div class="card" style="background-color: #111217; border: 1px solid #2a2d35;">
+        <div class="card-header" style="background-color: #1e2026; border-bottom: 1px solid #2a2d35;">
+            <h5 class="m-0 text-white" style="font-size: 1.1rem;">Filtros de Exportação</h5>
+        </div>
+        <div class="card-body p-4">
+            <form action="{{ url_for('baixar_relatorio') }}" method="GET">
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label" style="color: #8a8d93;">Data Inicial</label>
+                        <input type="date" class="form-control" name="data_inicio" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label" style="color: #8a8d93;">Data Final</label>
+                        <input type="date" class="form-control" name="data_fim" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label" style="color: #8a8d93;">Setor</label>
+                    <select class="form-select" name="setor" style="background-color: #1e2026; border: 1px solid #2a2d35; color: white;">
+                        <option value="todos">Todos os Setores</option>
+                        <option value="Gravacao">Gravação</option>
+                        <option value="Impressao">Impressão</option>
+                        <option value="Insertadora">Insertadora</option>
+                        <option value="Pré-Expedição">Pré-Expedição</option>
+                        <option value="Manuseio">Manuseio</option>
+                    </select>
+                </div>
+
+                <!-- Botão alterado para "BAIXAR RELATÓRIO" sem menção ao CSV -->
+                <button type="submit" class="btn w-100 py-2" style="background-color: #00b4d8; color: #111217; font-weight: bold; letter-spacing: 1px;">
+                    BAIXAR RELATÓRIO
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

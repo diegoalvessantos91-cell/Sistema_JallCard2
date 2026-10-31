@@ -1,0 +1,4 @@
+COMANDOS 
+pip install flask - instalar
+pip install waitress
+python app.py

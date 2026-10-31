@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D.A.S.H | Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-color: #0b0c10;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cartao-login {
+            background-color: #111217;
+            border: 1px solid #2a2d35;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 420px;
+            padding: 2.5rem 2rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .cartao-login:hover {
+            border-color: #00b4d8;
+        }
+
+        /* Animação e Estilo da Logo Centralizada */
+        .logo-login {
+            height: 110px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 0px 15px rgba(0, 180, 216, 0.6));
+            margin-bottom: 0.5rem;
+            animation: pulsar 3s infinite ease-in-out;
+        }
+
+        @keyframes pulsar {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0px 0px 12px rgba(0, 180, 216, 0.5)); }
+            50% { transform: scale(1.03); filter: drop-shadow(0px 0px 20px rgba(0, 180, 216, 0.8)); }
+        }
+
+        .titulo-dash {
+            font-size: 2.4rem;
+            color: #00b4d8;
+            font-weight: 900;
+            letter-spacing: 6px;
+            text-shadow: 0px 0px 15px rgba(0, 180, 216, 0.5);
+            margin-bottom: 0px;
+        }
+
+        .sub-dash {
+            font-size: 0.75rem;
+            color: #8a8d93;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 2rem;
+        }
+
+        .form-control {
+            background-color: #1e2026;
+            border: 1px solid #2a2d35;
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+        }
+
+        .form-control:focus {
+            background-color: #1e2026;
+            border-color: #00b4d8;
+            color: #ffffff;
+            box-shadow: 0 0 8px rgba(0, 180, 216, 0.25);
+        }
+
+        .btn-entrar {
+            background-color: #00b4d8;
+            border: none;
+            color: #0b0c10;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            padding: 0.75rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn-entrar:hover {
+            background-color: #0077b6;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 180, 216, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .form-label {
+            color: #8a8d93;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cartao-login">
+        
+        <!-- Área da Logo e Título (Totalmente Centralizados) -->
+        <div class="text-center">
+            <img src="{{ url_for('static', filename='dash-logo.png') }}" alt="D.A.S.H" class="logo-login"style="width: 350px; height: auto;">
+            <div class="sub-dash">System Hub</div>
+        </div>
+
+        <!-- Alerta de Erro -->
+        {% if erro %}
+        <div class="alert alert-danger py-2 text-center" style="font-size: 0.85rem; background-color: #842029; border: none; color: #f8d7da;">
+            {{ erro }}
+        </div>
+        {% endif %}
+
+        <!-- Formulário -->
+        <form method="POST">
+            <div class="mb-3">
+                <label for="usuario" class="form-label">Utilizador</label>
+                <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Insira o seu utilizador" required autocomplete="off">
+            </div>
+            
+            <div class="mb-4">
+                <label for="senha" class="form-label">Palavra-passe</label>
+                <input type="password" class="form-control" id="senha" name="senha" placeholder="Insira a sua palavra-passe" required>
+            </div>
+
+            <button type="submit" class="btn btn-entrar w-100 mb-2">Entrar</button>
+        </form>
+
+        <!-- Pequeno rodapé do cartão -->
+        <div class="text-center mt-4">
+            <span style="color: #4a4d55; font-size: 0.7rem; letter-spacing: 0.5px;">
+                © 2026 JallCard | Todos os direitos reservados
+            </span>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+body {
+    background-color: #17191e;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+}
+
+/* Centraliza o cartão abaixo do cabeçalho */
+.tela-login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 70px);
+}
+
+.login-card {
+    background-color: #21252b;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    border-top: 4px solid #00b4d8;
+    width: 100%;
+    max-width: 400px;
+}
+
+.btn-custom {
+    background-color: #00b4d8;
+    color: #17191e;
+    font-weight: bold;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.btn-custom:hover {
+    background-color: #0092af;
+    color: #ffffff;
+}

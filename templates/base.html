@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D.A.S.H — Workspace</title>
+    <!-- Tipografia de Alta Precisão -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #07080a;
+            --bg-surface: #0e1015;
+            --bg-surface-hover: #161922;
+            --bg-card: #111318;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(255, 255, 255, 0.2);
+            --text-primary: #f3f4f6;
+            --text-secondary: #a1a1aa;
+            --accent: #00b4d8;
+            --accent-glow: rgba(0, 180, 216, 0.15);
+            --success: #10b981;
+        }
+
+        [data-theme="light"] {
+            --bg-base: #f4f6f9;
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #e9ecef;
+            --bg-card: #ffffff;
+            --border-subtle: rgba(0, 0, 0, 0.12);
+            --border-active: rgba(0, 0, 0, 0.3);
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --accent: #00b4d8; 
+            --accent-glow: rgba(0, 180, 216, 0.15);
+            --success: #059669;
+        }
+
+        /* Torna os blocos escuros internos e distintivos claros no modo claro */
+        [data-theme="light"] div[style*="background"],
+        [data-theme="light"] span[style*="background"],
+        [data-theme="light"] td[style*="background"] {
+            background-color: #f1f5f9 !important;
+            color: #111827 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
+            margin: 0;
+            padding: 0;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+
+        /* Navbar Superior Principal */
+        .navbar-top {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.75rem 1.5rem;
+            position: relative;
+        }
+
+        /* Barra Secundária de Navegação (Setores) */
+        .navbar-sectors {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.6rem 1.5rem;
+        }
+
+        .nav-link-sector {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+        .nav-link-sector:hover, .nav-link-sector.active {
+            color: var(--text-primary);
+            background-color: var(--bg-surface-hover);
+        }
+
+        /* Cards Arquiteturais */
+        .card {
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 10px !important;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            color: var(--text-primary) !important;
+        }
+        .card-header, .card-footer {
+            background-color: transparent !important;
+            border-color: var(--border-subtle) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Regras para o Modo Claro */
+        [data-theme="light"] .card-header, 
+        [data-theme="light"] h4, 
+        [data-theme="light"] h5, 
+        [data-theme="light"] h6 {
+            color: #00b4d8 !important;
+            font-weight: 700;
+        }
+
+        [data-theme="light"] .card-body,
+        [data-theme="light"] .card-body span,
+        [data-theme="light"] .card-body div,
+        [data-theme="light"] p {
+            color: #111827 !important;
+        }
+
+        /* Botões */
+        .btn {
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            padding: 0.55rem 1.1rem !important;
+            transition: all 0.15s ease !important;
+        }
+
+        /* Botão de Alternar Tema */
+        .btn-theme-toggle {
+            background: var(--bg-surface-hover);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .btn-theme-toggle:hover {
+            border-color: var(--accent);
+        }
+
+        /* Inputs e Selects */
+        .form-control, .form-select {
+            background-color: var(--bg-base) !important;
+            border: 1px solid var(--border-subtle) !important;
+            color: var(--text-primary) !important;
+            border-radius: 6px !important;
+            padding: 0.65rem 0.9rem;
+            font-size: 0.95rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 2px var(--accent-glow) !important;
+        }
+
+        /* Adaptação inteligente para tabelas */
+        [data-theme="light"] .table-dark {
+            --bs-table-bg: #ffffff !important;
+            --bs-table-color: #111827 !important;
+            color: #111827 !important;
+            border-color: var(--border-subtle) !important;
+        }
+        [data-theme="light"] .table-dark td, [data-theme="light"] .table-dark th {
+            color: #111827 !important;
+            border-color: var(--border-subtle) !important;
+        }
+
+        [data-theme="dark"] .table-dark {
+            --bs-table-bg: #111318 !important;
+            --bs-table-color: #f3f4f6 !important;
+            color: #f3f4f6 !important;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--bg-surface-hover) !important;
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV BAR SUPERIOR -->
+    <header class="navbar-top">
+        <div class="container-fluid d-flex justify-content-between align-items-center position-relative">
+            
+            <!-- Esquerda: Logótipo da JallCard -->
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('dashboard') }}" class="text-decoration-none d-flex align-items-center">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="JallCard" style="height: 64px; width: auto; object-fit: contain;">
+                </a>
+            </div>
+
+            <!-- Centro: D.A.S.H Centralizado -->
+            <div class="position-absolute start-50 translate-middle-x">
+                <a href="{{ url_for('dashboard') }}" class="text-decoration-none" style="font-weight: 800; font-size: 1.5rem; letter-spacing: 0.08em; color: var(--text-primary);">
+                    D.A.S.H
+                </a>
+            </div>
+
+            <!-- Direita: Relógio + Botão de Tema + Utilizador -->
+            <div class="d-flex align-items-center gap-3">
+                <div id="liveClock" class="tabular-nums px-3 py-1.5" style="font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-surface-hover); border: 1px solid var(--border-subtle); border-radius: 6px;">
+                    00:00:00
+                </div>
+
+                <!-- Botão de Alternar Modo Claro / Escuro -->
+                <button class="btn-theme-toggle" id="themeToggleBtn" onclick="alternarTema()" title="Alternar Modo Claro/Escuro">
+                    🌙
+                </button>
+
+                <div class="dropdown">
+                    <a class="dropdown-toggle d-flex align-items-center gap-2 text-decoration-none px-3 py-1.5" href="#" role="button" data-bs-toggle="dropdown" style="background: var(--bg-surface-hover); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-primary) !important;">                        
+                        <div style="width: 42px; height: 42px; background: #27272a; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2.0rem;">
+                            {{ session.get('avatar', '👤') }}
+                        </div>
+                        <span style="font-size: 0.95rem; font-weight: 500;">{{ session.get('nome_usuario', 'Utilizador') }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg" style="background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 6px; margin-top: 8px;">
+                        <li><a class="dropdown-item rounded py-2" href="{{ url_for('perfil') }}" style="font-size: 0.925rem; color: var(--text-primary);">⚙️ Meu Perfil</a></li>
+                        <li><hr class="dropdown-divider" style="border-color: var(--border-subtle);"></li>
+                        <li><a class="dropdown-item rounded py-2 text-danger" href="{{ url_for('logout') }}" style="font-size: 0.925rem;">🚪 Terminar Sessão</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- BARRA SECUNDÁRIA DE NAVEGAÇÃO DOS SETORES -->
+    <nav class="navbar-sectors">
+        <div class="container-fluid d-flex flex-wrap gap-2 align-items-center">
+            
+            {% if session.get('acesso_gravacao') or session.get('is_admin') %}
+            <a class="nav-link-sector" href="{{ url_for('gravacao') }}">Gravação</a>
+            {% endif %}
+            
+            {% if session.get('acesso_impressao') or session.get('is_admin') %}
+            <a class="nav-link-sector" href="{{ url_for('impressao') }}">Impressão</a>
+            {% endif %}
+            
+            {% if session.get('acesso_insertadora') or session.get('is_admin') %}
+            <a class="nav-link-sector" href="{{ url_for('insertadora') }}">Insertadora</a>
+            {% endif %}
+            
+            {% if session.get('acesso_manuseio') or session.get('is_admin') %}
+            <a class="nav-link-sector" href="{{ url_for('manuseio_tela') }}">Manuseio</a>
+            {% endif %}
+            
+            {% if session.get('acesso_pre_expedicao') or session.get('is_admin') %}
+            <a class="nav-link-sector" href="{{ url_for('pre_expedicao') }}">Pré-Expedição</a>
+            {% endif %}
+            
+            {% if session.get('is_admin') %}
+            <div class="vr bg-secondary opacity-25 mx-2" style="height: 22px;"></div>
+            <a class="nav-link-sector" href="{{ url_for('auditoria') }}">Auditoria</a>
+            <a class="nav-link-sector" href="{{ url_for('usuarios') }}">Utilizadores</a>
+            <a class="nav-link-sector" href="{{ url_for('maquinas') }}">Máquinas</a>
+            {% endif %}
+            
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="container pb-5 mt-4" style="max-width: 1450px;">
+        {% block conteudo %}{% endblock %}
+    </main>
+
+    <!-- Scripts (Relógio e Tema) -->
+    <script>
+        function atualizarRelogio() {
+            const agora = new Date();
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            const segundos = String(agora.getSeconds()).padStart(2, '0');
+            document.getElementById('liveClock').innerText = `${horas}:${minutos}:${segundos}`;
+        }
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+
+        // Alternância de Tema com persistência
+        function alternarTema() {
+            const htmlTag = document.documentElement;
+            const btn = document.getElementById('themeToggleBtn');
+            
+            if (htmlTag.getAttribute('data-theme') === 'dark') {
+                htmlTag.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                btn.textContent = '☀️';
+            } else {
+                htmlTag.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                btn.textContent = '🌙';
+            }
+        }
+
+        // Aplica o tema guardado ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const htmlTag = document.documentElement;
+            htmlTag.setAttribute('data-theme', savedTheme);
+            const btn = document.getElementById('themeToggleBtn');
+            if (btn) {
+                btn.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
